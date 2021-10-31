@@ -23,6 +23,17 @@ async function run()
         await client.connect();
         const database = client.db('tourXTravels');
         const packageCollection = database.collection('packages');
+        const orderCollection = database.collection('order');
+
+
+        // POST API
+        app.post('/packages', async (req, res) =>
+        {
+            const newService = req.body;
+            const result = await packageCollection.insertOne(newService);
+            res.json(result)
+        })
+
 
 
         // GET Products API
@@ -32,6 +43,35 @@ async function run()
             const packages = await cursor.toArray();
             res.send(packages)
         })
+
+
+        // Order post api
+        app.post('/orders', async (req, res) =>
+        {
+            const order = req.body;
+            const result = await orderCollection.insertOne(order);
+            res.json(result)
+        })
+
+
+        // Order get api
+        app.get("/orders/:email", async (req, res) =>
+        {
+            const email = req.params.email;
+            const cursor = orderCollection.find({});
+            const orders = await cursor.toArray();
+            const userOrder = orders.filter((mail) => mail.email === email);
+            res.send(userOrder);
+        });
+
+        // Get All Order
+        app.get('/allorders', async (req, res) =>
+        {
+            const cursor = orderCollection.find({});
+            const result = await cursor.toArray();
+            res.send(result);
+        })
+
     }
     finally
     {
